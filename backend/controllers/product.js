@@ -1,3 +1,66 @@
 const Product = require("../models/product");
 
-module.exports = router;
+exports.addProduct = async (req, res) => {
+  const newProduct = new Product(req.body);
+  try {
+    const savedProduct = await newProduct.save();
+    res.status(200).json(savedProduct);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+exports.updateProduct = async (req, res) => {
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: req.body,
+      },
+      { new: true }
+    );
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+exports.deleteProduct = async (req, res) => {
+  try {
+    await Product.findByIdAndUpdate(req.params.id);
+    res.status(200).json("Product has been deleted...");
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+exports.getProduct = async (req, res) => {
+  try {
+    const product = Product.findById(req.params.id);
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+exports.getAllProduct = async (req, res) => {
+  const qNew = req.query.new;
+  const qcategory = req.query.category;
+  try {
+    let products;
+    if (qNew) {
+      products = await Product.find().sort({ careatedAt: -1 }).limit(5);
+    } else if (qcategory) {
+      products = await Product.find({
+        category: {
+          $in: [qcategory],
+        },
+      });
+    } else {
+      products = await Product.find();
+    }
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};

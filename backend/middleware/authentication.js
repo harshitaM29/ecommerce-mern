@@ -9,7 +9,6 @@ const authenticate = async (req, res, next) => {
     const userInfo = jwt.verify(token, process.env.SECRET_KEY);
 
     const user = await User.findById(userInfo.id);
-    console.log(userInfo);
     req.user = user;
     next();
   } catch (err) {
@@ -18,7 +17,6 @@ const authenticate = async (req, res, next) => {
 };
 
 const verifyTokenAndAuthorization = (req, res, next) => {
-  console.log("hi");
   authenticate(req, res, () => {
     if (req.user.id === req.params.id || req.user.isAdmin) {
       next();
@@ -29,18 +27,13 @@ const verifyTokenAndAuthorization = (req, res, next) => {
 };
 
 const verifyTokenAndAdmin = (req, res, next) => {
-  console.log("hi");
-
   authenticate(req, res, () => {
-    console.log(req.user);
     if (req.user.isAdmin) {
       next();
     } else {
       res.status(403).json("You are not alowed to do that!");
     }
   });
-
-  console.log("hi");
 };
 
 module.exports = {
